@@ -1,13 +1,14 @@
 # Focus Train — improvement plan
 
 Scoped so that implementation is mostly mechanical. Every item names the exact
-function it hooks into, in the numbered sections of the `<script>` in `index.html`.
+function it hooks into, in the numbered sections of the `<script>` in `index.html` (§1–§14; see
+`handoff.md` for the full section map).
 
 **Standing constraints:** no build step, no npm, no framework. Everything below
 holds to that. Ambient audio is synthesized, not downloaded.
 
-**Do this first — split the file.** `index.html` is ~78 KB / 1,540 lines. Sound
-and camera add roughly 350 lines. The design doc (§6) already sanctions the split
+**Do this first — split the file.** `index.html` is ~78 KB / 1,708 lines. Sound
+and camera add roughly 350 lines. The design doc (§6 Tech Stack) already sanctions the split
 at this point: `index.html` + `app.js` + `styles.css`, still no build step, still
 deploys identically. Do it as one mechanical move *before* the features, or the
 diffs below get painful to review.
@@ -25,12 +26,12 @@ ocean, wind, thunder) synthesize convincingly; human voices do not.** A café is
 therefore built as room tone + crockery transients, not babble — it reads as
 "a room with people in it," which is the useful part anyway.
 
-The `AudioContext` and the gesture-gated `ensureAudio()` already exist (§7), so
+The `AudioContext` and the gesture-gated `ensureAudio()` already exist (§6), so
 the hard browser-policy work is done.
 
 ### 1.2 Architecture
 
-New section **§7b `Soundscape`**, after `chime()`. One shared noise buffer, one
+New section **§6b `Soundscape`**, after `chime()`. One shared noise buffer, one
 graph per scape, crossfaded.
 
 ```js
@@ -74,7 +75,7 @@ function pump(){                           // called every ~2s AND on visibility
 
 Even if the pump timer is throttled to once every 5 s, audio stays seamless
 because 8 s are already queued on the audio clock. Reuse the existing
-`visibilitychange` handler (§15) to pump on return.
+`visibilitychange` handler (§13) to pump on return.
 
 ### 1.4 Scape recipes
 
@@ -107,23 +108,23 @@ so old saves need no migration:
 settings: { ..., soundId:"none", soundVolume:0.5, soundDuringBreak:true }
 ```
 
-- **Settings panel** (§13 `renderSettings`): a new `<h4>Ambient</h4>` section above
+- **Settings panel** (§11 `renderSettings`): a new `<h4>Ambient</h4>` section above
   Signals — a grid of scape chips reusing the `.th` button style from the theme
   picker, plus a range input for volume. Selecting a scape while idle previews it
   for 4 s so the user can audition without starting a ride.
-- **Ride console** (§11 `renderRide`): a small speaker icon that cycles
+- **Ride console** (§10 `renderRide`): a small speaker icon that cycles
   mute/unmute, so it is reachable without opening Settings.
 
 ### 1.6 Integration points
 
 | Where | Change |
 |---|---|
-| `board()` §8 | after `ensureAudio()`, `playScape(db.settings.soundId)` with a 2 s fade-in |
-| `complete()` §8 | fade ambient to 0 over 1.5 s *before* `chime("arrive")` so the bell lands in silence; restart after the layover if `soundDuringBreak` |
-| `stopRide()` §8 | `stopScape()` |
-| `endBreak()` §8 | `stopScape()` if the layover was silent |
-| §15 visibility | call `pump()` on return |
-| `renderSettings()` §13 | the Ambient section |
+| `board()` §7 | after `ensureAudio()`, `playScape(db.settings.soundId)` with a 2 s fade-in |
+| `complete()` §7 | fade ambient to 0 over 1.5 s *before* `chime("arrive")` so the bell lands in silence; restart after the layover if `soundDuringBreak` |
+| `stopRide()` §7 | `stopScape()` |
+| `endBreak()` §7 | `stopScape()` if the layover was silent |
+| §13 visibility | call `pump()` on return |
+| `renderSettings()` §11 | the Ambient section |
 
 ### 1.7 Risks
 
@@ -217,11 +218,11 @@ the arrival chime land on something.
 
 | Where | Change |
 |---|---|
-| `buildMap()` §6 | stash `NATIONAL_VIEWBOX` and `NATIONAL_W` after fitting |
-| `paint()` §10 | after computing `p`/`frac`, compute the camera and write `viewBox` + `--k` |
-| `board()` / `complete()` / `stopRide()` §8 | kick a 1.2 s eased transition between national and ride framing — one `requestAnimationFrame` lerp over the 4 viewBox numbers, `easeInOutCubic` |
-| `renderSettings()` §13 | `settings.camera`: `"follow"` \| `"network"`, and a pace slider |
-| §15 reduced motion | if `RM.matches`, jump rather than ease and update the camera once per second (`paint()` already runs at 1 Hz there) |
+| `buildMap()` §5 | stash `NATIONAL_VIEWBOX` and `NATIONAL_W` after fitting |
+| `paint()` §9 | after computing `p`/`frac`, compute the camera and write `viewBox` + `--k` |
+| `board()` / `complete()` / `stopRide()` §7 | kick a 1.2 s eased transition between national and ride framing — one `requestAnimationFrame` lerp over the 4 viewBox numbers, `easeInOutCubic` |
+| `renderSettings()` §11 | `settings.camera`: `"follow"` \| `"network"`, and a pace slider |
+| §13 reduced motion | if `RM.matches`, jump rather than ease and update the camera once per second (`paint()` already runs at 1 Hz there) |
 
 Add a **toggle in the ride console** too — some people will want the whole
 network on screen while they work. Default to follow.
@@ -249,7 +250,7 @@ function riddenLegs(){                   // memoise, invalidate on ride push
   return s;
 }
 ```
-Hook: `renderMap()` §10, add `.rail.ridden`. ~15 lines.
+Hook: `renderMap()` §9, add `.rail.ridden`. ~15 lines.
 
 ### 3.2 Miles
 Every city has real coordinates, so haversine is free. Show "472 miles" on the
@@ -260,7 +261,7 @@ Far more evocative than an abstract point total. ~20 lines, no schema change.
 ### 3.3 Countdown in the tab title ★ cheap, high value
 The user is in another app by design; the tab strip is the one piece of this UI
 they still see. `document.title = "12:34 · Philadelphia"` during a ride, restore
-on idle. Update it inside `updateClock()` §11 — about 4 lines, and it makes the
+on idle. Update it inside `updateClock()` §10 — about 4 lines, and it makes the
 timer glanceable without switching apps.
 
 ### 3.4 Multi-tab guard — a real bug
@@ -279,7 +280,7 @@ visible focus ring, so keyboard users cannot see where they are. Add one rule:
 not to.
 
 ### 3.6 Stats worth adding
-All derive from `rides[]`, all in `renderStats()` §13:
+All derive from `rides[]`, all in `renderStats()` §11:
 - **By service** — a small horizontal bar per line, in that line's colour.
 - **Time of day** — 24-bucket histogram of ride starts. Answers "when do I
   actually focus," which is the most actionable thing this data holds.
