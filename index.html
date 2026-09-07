@@ -1384,6 +1384,10 @@ function applyTheme(id){
   if(!THEMES.some(t => t.id === id)) id = "night";
   db.settings.theme = id;
   document.documentElement.setAttribute("data-theme", id);
+  /* keeps the installed app's window chrome in step with the chosen theme */
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content",
+    getComputedStyle(document.documentElement).getPropertyValue("--ink").trim() || "#0b0f14");
   save();
 }
 
