@@ -24,11 +24,26 @@ likely to break by accident.
 | Local | `/Users/avi/Desktop/focus train app` |
 | Repo | https://github.com/aviparkhe/focus-train (**public**, branch `main`) |
 | Live | https://aviparkhe.github.io/focus-train/ (Pages, `main` / root) |
-| Local test server | `python3 -m http.server 8777` in the project dir |
+| Local test server | `python3 -m http.server 8777` in the project dir — **not running**; started only on demand |
 
-Files: `index.html` (the entire app, ~1,708 lines), `README.md`,
+**The live Pages URL is the canonical home for ride data.** The `localhost:8777`
+history was migrated there and then deliberately cleared, and that server was
+stopped, so there is exactly one copy and no chance of two divergent histories.
+If you start a local server again it will have empty storage — that is correct.
+A snapshot of the real history sits in `focus-train-backup-2026-09-07.json`
+(gitignored, never committed).
+
+Files: `index.html` (the entire app, ~1,717 lines), `README.md`,
 `focus-train-design-doc.md` (the original spec), `improve.md` (roadmap),
-`CLAUDE.md` (this file), `.gitignore`, `.nojekyll`.
+`CLAUDE.md` (this file), `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
+`icon-maskable-512.png`, `.gitignore`, `.nojekyll`.
+
+**Installable.** The manifest plus icons make Chrome's "Install page as app" and
+Safari's "Add to Dock" produce a real standalone Dock app. Icons are generated
+from the wordmark glyph — the generating script is not kept; regenerate with PIL
+if the mark changes. `applyTheme()` also rewrites the `theme-color` meta from the
+computed `--ink`, so the installed window chrome follows the active theme; keep
+that in step if the theme tokens are reworked.
 
 **Git identity is set repo-locally, not globally** — `avi` /
 `87142762+aviparkhe@users.noreply.github.com`. The noreply address is deliberate:
@@ -229,13 +244,23 @@ map. Desktop-first is per the design doc; it just shouldn't break, and it doesn'
 
 ## 9. Gotchas discovered
 
-- `localStorage` is **per origin**. History at `localhost:8777` does not follow to
-  the Pages URL. Use Settings → Export/Import to move it.
+- `localStorage` is **per origin**. `localhost:8777`, the Pages URL and a
+  `file://` copy each have separate, independent storage. Use Settings →
+  Export/Import to move history between them.
+- **Never wrap two independent string edits in one `assert s != o`.** It cost a
+  bad deploy this session: the manifest shipped but its `<link>` tag did not,
+  because the second anchor did not match and the first edit's success satisfied
+  the assertion. Assert each replacement, and check the anchor is present *and*
+  unique. Then verify against what is actually **served**, not what was committed.
 - `git ls-remote --exit-code <url>` returns failure on an **empty** repo (no
   refs), which looks identical to "repo doesn't exist". Don't use `--exit-code`
   to probe for a freshly created repo.
-- GitHub Pages' first deploy takes ~2–4 minutes; polling with a short timeout
-  will report 404 and look like a misconfiguration.
+- GitHub Pages deploys take ~1–4 minutes, and a redeploy keeps serving the old
+  build until it finishes — a 404 or stale HTML right after a push is normal, not
+  a misconfiguration. Check Actions → "pages build and deployment" before
+  debugging. Chrome may also hold a cached copy; `location.reload(true)`.
+- The Bash tool blocks foreground `sleep`, so a shell poll loop spins instantly
+  and reports a false negative. Poll from a `python3` heredoc using `time.sleep`.
 - `resize_window` via browser automation silently does nothing when Chrome is
   macOS-fullscreen. To test a narrow viewport, load the page in a sized `<iframe>`
   instead — media queries evaluate against the iframe viewport.
