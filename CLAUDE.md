@@ -1,7 +1,7 @@
-# Handoff — Focus Train
+# Focus Train — project context
 
-Everything a fresh session needs to pick this up cold. Written 2026-09-07, at the
-end of the session that built the whole thing.
+Everything a session needs to pick this up cold; Claude Code loads this file
+automatically. Written 2026-09-07, at the end of the session that built it.
 
 ---
 
@@ -28,7 +28,7 @@ likely to break by accident.
 
 Files: `index.html` (the entire app, ~1,708 lines), `README.md`,
 `focus-train-design-doc.md` (the original spec), `improve.md` (roadmap),
-`handoff.md` (this), `.gitignore`, `.nojekyll`.
+`CLAUDE.md` (this file), `.gitignore`, `.nojekyll`.
 
 **Git identity is set repo-locally, not globally** — `avi` /
 `87142762+aviparkhe@users.noreply.github.com`. The noreply address is deliberate:

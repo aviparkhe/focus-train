@@ -2,7 +2,7 @@
 
 Scoped so that implementation is mostly mechanical. Every item names the exact
 function it hooks into, in the numbered sections of the `<script>` in `index.html` (§1–§14; see
-`handoff.md` for the full section map).
+`CLAUDE.md` for the full section map).
 
 **Standing constraints:** no build step, no npm, no framework. Everything below
 holds to that. Ambient audio is synthesized, not downloaded.

@@ -14,7 +14,7 @@ dependencies, no backend.
 | [`index.html`](index.html) | The whole app — markup, styles and logic in one file |
 | [`focus-train-design-doc.md`](focus-train-design-doc.md) | The original spec this was built to |
 | [`improve.md`](improve.md) | Roadmap: ambient audio, ride camera, and known defects |
-| [`handoff.md`](handoff.md) | Full context: architecture, invariants, decisions and gotchas |
+| [`CLAUDE.md`](CLAUDE.md) | Full context: architecture, invariants, decisions and gotchas |
 
 ## Run it
 
