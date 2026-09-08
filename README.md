@@ -11,10 +11,11 @@ dependencies, no backend.
 
 | File | What it is |
 | --- | --- |
-| [`index.html`](index.html) | The whole app — markup, styles and logic in one file |
+| [`index.html`](index.html) | Markup and the pre-paint theme script |
+| [`app.js`](app.js) | The whole app — no build step, no dependencies |
+| [`styles.css`](styles.css) | Themes and every style |
 | [`focus-train-design-doc.md`](focus-train-design-doc.md) | The original spec this was built to |
-| [`improve.md`](improve.md) | Roadmap: ambient audio, ride camera, and known defects |
-| [`CLAUDE.md`](CLAUDE.md) | Full context: architecture, invariants, decisions and gotchas |
+| [`CLAUDE.md`](CLAUDE.md) | Full context: architecture, invariants, gotchas, and the roadmap (§7) |
 
 ## Run it
 

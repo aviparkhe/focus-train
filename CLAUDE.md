@@ -1,7 +1,9 @@
 # Focus Train — project context
 
 Everything a session needs to pick this up cold; Claude Code loads this file
-automatically. Written 2026-09-07, at the end of the session that built it.
+automatically. Written 2026-09-07 at the end of the session that built it, and
+updated later that day by the session that split the file and added the
+multi-tab guard, focus rings and ambient sound.
 
 ---
 
@@ -33,9 +35,10 @@ If you start a local server again it will have empty storage — that is correct
 A snapshot of the real history sits in `focus-train-backup-2026-09-07.json`
 (gitignored, never committed).
 
-Files: `index.html` (the entire app, ~1,717 lines), `README.md`,
-`focus-train-design-doc.md` (the original spec), `improve.md` (roadmap),
-`CLAUDE.md` (this file), `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
+Files: `index.html` (76 lines — markup only), `app.js` (~1,560 lines, the whole
+app), `styles.css` (~430 lines), `README.md`,
+`focus-train-design-doc.md` (the original spec), `CLAUDE.md` (this file — the
+roadmap lives in §7; `improve.md` was folded into it and deleted), `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
 `icon-maskable-512.png`, `.gitignore`, `.nojekyll`.
 
 **Installable.** The manifest plus icons make Chrome's "Install page as app" and
@@ -63,7 +66,7 @@ lands in the public repo by accident.
    - **Amtrak-style continental network, not a metro/transit diagram.**
    - **Add multiple themes**, not just dark-with-yellow.
 3. Rebuilt the map layer and added theming via targeted edits.
-4. Wrote `improve.md` (roadmap) while the user test-ran the app.
+4. Wrote a roadmap (later folded into §7) while the user test-ran the app.
 5. Initialised git, pushed, enabled GitHub Pages, verified the live deploy.
 
 The user's city allow-list (do not add cities outside it without asking):
@@ -89,6 +92,9 @@ is easy to "helpfully" undo.
   finish. The `visibilitychange` handler only re-syncs the display.
 - **Completion and layover-end each get their own `setTimeout`.** A throttled
   tab's repaint poll is not a reliable clock; the timers are.
+- **The ridden-track record and all mileage derive from `rides[]`** — no schema
+  change, nothing stored. `riddenLegs()` is memoised on `db.rides.length`, so an
+  import or a reset rebuilds it without an explicit invalidation.
 - **`rides[]` is the single source of truth.** Points, streaks, counts and the
   heatmap are recomputed from the log on every load (`computeStats()`), never
   trusted from stored counters. `stats` is a cache only.
@@ -107,29 +113,61 @@ is easy to "helpfully" undo.
   ride insurance — the doc rules these out explicitly.
 - **Audio must be created on the boarding click** (autoplay policy), which is why
   `ensureAudio()` is called from `board()`.
+- **Exactly one tab drives the clock** (§2b). `complete()` and `endBreak()` are
+  guarded by `driving`, and only the driving tab runs the timers. Removing a
+  guard brings back double-counted rides and inflated points.
+- **Ownership is settled by asking, never by a heartbeat.** A hidden tab's timers
+  are throttled to ~1/min, so a heartbeat from the driving tab reads as dead and
+  a second tab claims alongside it. Message *delivery* is not throttled that way,
+  so `who?`/`iam` is the test that holds. Don't "improve" this into a heartbeat.
+- **The camera has exactly one writer.** `paint()` only ever sets `cam.tgt`;
+  `camStep()` eases `cur → tgt` and is the only thing that touches the
+  `viewBox`. Do not reintroduce per-call transitions in `board()`/`complete()` —
+  they fight over the same four numbers.
+- **The camera glide is time-based, not per-frame** — same rule as the ride
+  clock. A per-frame lerp settles in under a second foregrounded and takes ~50 s
+  in a throttled tab.
+- **Everything except `#land` is counter-scaled by `--k`** so it holds a constant
+  *screen* size at 10–20× zoom. Each CSS variant needs its own scaled rule
+  (`.lbl.plain` outranks `.lbl`), and the rules must sit *after* the base ones.
+  Label offsets are map units, so `scaleMap()` re-anchors them in JS.
+- **Ambient events are queued on the AudioContext clock, never fired by a timer**
+  (§6b `pump()`). Same hazard as the ride timer, same answer: `setInterval` only
+  queues 8 s ahead; it never makes a sound itself. Each layer carries its own
+  queue pointer.
+- **`canSound()` gates every bed.** Ambience is a mixer — any number of scapes
+  run at once — so exactly one tab may build layers: whichever drives the clock
+  while a ride or layover is running, any tab when everything is idle. Without
+  it a mirroring tab quietly builds a second full graph.
 - Respect `prefers-reduced-motion`.
 
 ## 5. Architecture
 
-Single self-contained `index.html`: vanilla JS, inline SVG, inline CSS. No build
-step, no npm, no framework, no dependencies, no backend. Keep it that way.
+Three files — `index.html` (markup and the pre-paint theme script), `app.js`,
+`styles.css` — loaded with a plain `<link>` and `<script src>`. Vanilla JS,
+inline SVG. No build step, no npm, no framework, no dependencies, no backend.
+Keep it that way. `app.js` is a classic script, not a module, so everything in
+it stays reachable from the console — which is how this app is tested (§6).
 
-The `<script>` is divided into numbered sections. Current map (line numbers drift
+`app.js` is divided into numbered sections. Current map (line numbers drift
 — grep the section banners):
 
 | § | Contents | Key functions |
 |---|---|---|
 | 1 | Constants, projection, geography, services, themes | `project()`, `US_OUTLINE`, `LAKE_MICHIGAN`, `CITIES`, `ROUTES`, `CHARTER`, `THEMES`, `DEFAULTS` |
 | 2 | Storage | `clone`, `deepMerge`, `load`, `save` |
+| 2b | Multi-tab guard | `takeDrive`, `dropDrive`, `probeDrive`, `ensureDriver`, `post` |
 | 3 | Derived stats | `computeStats`, `dayKey`, `dailyMinutes` |
-| 4 | Route helpers | `allRoutes`, `routeById`, `standingAt`, `legIndex`, `stopName`, `routeMinutes`, `clampMin` |
+| 4 | Route helpers, distance, ridden track | `allRoutes`, `routeById`, `standingAt`, `legIndex`, `stopName`, `routeMinutes`, `haversine`, `legMiles`, `routeMiles`, `lifetimeMiles`, `riddenLegs`, `clampMin` |
 | 5 | Map geometry & drawing | `routeGeometry`, `el`, `buildMap` |
 | 6 | Audio | `ensureAudio`, `tone`, `chime`, `notify`, `askNotify` |
-| 7 | Ride lifecycle | `phase`, `rideEnd`, `select`, `board`, `scheduleCompletion`, `scheduleBreakEnd`, `complete`, `stopRide`, `skipBreak`, `endBreak`, `resolveOnLoad` |
+| 6b | Soundscape | `SCAPE_BUILD`, `SCAPE_GAIN`, `applyMix`, `startLayer`, `endLayer`, `stopAmbient`, `canSound`, `pump`, `duckAmbient` |
+| 7 | Ride lifecycle | `phase`, `rideEnd`, `select`, `board`, `scheduleCompletion`, `scheduleBreakEnd`, `complete`, `stopRide`, `skipBreak`, `endBreak`, `resolveActiveRide`, `resolveOnLoad` |
 | 8 | Formatting | `fmtClock`, `fmtDur`, `esc`, `showToast` |
 | 9 | Render — map | `renderMap`, `paint` |
+| 9b | Ride camera | `cameraFor`, `camStep`, `applyCam`, `scaleMap`, `setCamTarget`, `NATIONAL`, `NATIONAL_W` |
 | 10 | Render — console | `nextStopText`, `renderConsole`, `renderBoard`, `renderRide`, `updateClock`, `renderHeader`, `renderAll`, `applyTheme` |
-| 11 | Panels | `openPanel`, `closePanels`, `renderStats`, `renderSettings` |
+| 11 | Panels — journey log, ambience, settings | `openPanel`, `closePanels`, `renderStats`, `renderAmbience`, `renderSettings` |
 | 12 | Export / import | `exportData`, `importData` |
 | 13 | Paint loop + visibility | `loop`, `startLoop`, `stopLoop` |
 | 14 | Boot | |
@@ -139,7 +177,11 @@ The `<script>` is divided into numbered sections. Current map (line numbers drif
 ```js
 { schemaVersion:1,
   settings:{ breakMinutes, longBreakMinutes, roundsUntilLongBreak,
-             chimeEnabled, notifyEnabled, charterMinutes, theme },
+             chimeEnabled, notifyEnabled, charterMinutes, theme,
+             soundMix, soundVolume, soundMuted, soundDuringBreak,
+             camera, pace },
+             // soundMix is { scapeId: 0..1 } and every entry plays at once
+             // camera "follow"|"network"; pace is px/min of apparent speed
   customRoutes:[{id,name,minutes}],
   activeRide:{id,routeId,legIndex,plannedMinutes,startedAt} | null,
   activeBreak:{kind,routeId,endsAt} | null,
@@ -182,8 +224,13 @@ The `<script>` is divided into numbered sections. Current map (line numbers drif
 
 ### Theming
 
-Seven themes as CSS custom-property sets on `:root[data-theme="…"]`: `night`
-(default), `daybreak`, `blueprint`, `sequoia`, `ember`, `terminal`, `alpine`.
+Eight themes as CSS custom-property sets on `:root[data-theme="…"]`, deliberately
+balanced **four dark** (`night` — default, `blueprint`, `ember`, `terminal`) and
+**four light** (`daybreak`, `timetable`, `alpine`, `porcelain`), and shown in the
+settings picker as two labelled columns. Each entry in `THEMES` carries
+`mode:"dark"|"light"`, which is what splits the columns — keep it in step, and
+keep the counts even if you add one. `sequoia` was retired to make room; a save
+still naming it falls through `applyTheme()` to `night`.
 Everything — map, chrome, heatmap, buttons — reads from those tokens; there
 should be **no hardcoded colours** outside the theme blocks except the five route
 line colours (mid-tone by design so they read on both light and dark grounds).
@@ -211,25 +258,149 @@ pattern that worked, and is cheap to repeat:
 
 Always clear `localStorage.removeItem("focus-train-v1")` after seeding test data.
 
-## 7. Known issues and next steps
+## 7. Roadmap
 
-`improve.md` is the roadmap and is written to make implementation cheap — it
-names exact functions and sections. Headlines:
+`improve.md` used to hold this and has been deleted — everything still live from
+it is below. It was a plan for work that is now done; keeping it around meant two
+documents disagreeing about what was built.
 
-- **Ambient sound** — synthesized (not sample files) to keep the zero-asset
-  deploy. Includes the background-tab scheduling trap and per-scape filter graphs.
-- **Ride camera** — the train moves ~1.5 px/min at national view, i.e. visually
-  static. Measured; the fix needs deep zoom plus a "route strip" mode.
-- **Two genuine defects, not enhancements:**
-  - Two open tabs both write `activeRide` and both log an arrival → double-counted
-    rides and inflated points. Needs a `BroadcastChannel` guard.
-  - No `:focus-visible` styling, so keyboard users can't see focus on the
-    departures board (the rows are real `<button>`s and are reachable).
-- Best-value idea: light up track already ridden, derived from `rides[]` with no
-  schema change — turns the map into a record of your history.
+### 7.1 What that roadmap delivered (all shipped, 2026-09-07)
 
-Also open: the narrow-window layout (<1000px) stacks the console and squeezes the
-map. Desktop-first is per the design doc; it just shouldn't break, and it doesn't.
+Ambient sound (§6b), the ride camera (§9b), the multi-tab guard (§2b),
+`:focus-visible` + `aria-live`, the ridden-track record, real mileage, and the
+tab-title countdown. The file split (`index.html` + `app.js` + `styles.css`)
+came first and was mechanical. Details of each live in §4 (rules), §5
+(architecture) and §9 (gotchas) of this file.
+
+### 7.2 Hard-won lessons from that work — do not re-derive these
+
+- **`SCAPE_GAIN` values are empirical**, measured as RMS off an analyser spliced
+  in as `bus → analyser → destination`. The first pass ran from `rails` 0.373 to
+  `night` 0.004 — a 90x spread. Re-measure rather than reason if a scape's graph
+  changes; peak *and* mean over >=3.5 s, and >=9 s for `ocean` and `thunder`,
+  whose content is a slow swell and a rare clap.
+- **`GainNode.gain.value` read straight after scheduling a ramp is not a usable
+  probe** — it does not reflect pending automation. Measure the output.
+- **The lookahead scheduler was verified by killing the pump outright**: after
+  6 s with no JS running there were still 2.2 s of events queued on the audio
+  clock. `pump()` snaps `nextAt` forward when behind — without it a tab frozen
+  for five minutes wakes and dumps five minutes of crackles at once.
+- **Camera: measure apparent speed along the path (2D distance), not horizontal
+  displacement.** A near-vertical leg like Seattle→Portland reads as ~0 px/min
+  if you only difference `x`.
+- **Window *height* is the camera's real constraint, not width.** The stage is
+  ~2.4:1, so a vertical leg loses context long before a horizontal one of the
+  same length. That is why the camera pulls out from the origin as well as in to
+  the destination.
+- **Do not verify CSS scaling with `getComputedStyle`** after mutating a custom
+  property from the automation console — it returns stale values and will tell
+  you the whole approach failed when it works. Screenshot it instead.
+- **Counter-scaling rules must sit *after* the base rules and restate every
+  variant** — `.lbl.plain` outranks `.lbl` and was missed on the first pass.
+
+### 7.3 Still open from the old roadmap
+
+Small, all deriving from `rides[]`, no schema change unless noted:
+
+- **Stats worth adding** (`renderStats()` §11): by-service bars in each line's
+  colour; a 24-bucket time-of-day histogram of ride starts ("when do I actually
+  focus" is the most actionable thing this data holds); completion rate by
+  duration (do 90-minute rides actually get finished?).
+- **A note on an incomplete ride** — on `stopRide()`, offer an optional one-line
+  input and store `note` on the ride. Additive field; merge-on-load handles it.
+  Turns the log from a record of failure into something diagnostic, which is in
+  the spirit of the no-shaming rule.
+- **Service completion** — count end-to-end traversals per service (`journey`
+  wraps) and show "Crescent x3" in the journey log.
+- **Smaller:** decide deliberately whether `round` should advance after an
+  incomplete ride (currently untouched — defensible, but comment it); an export
+  nudge after 50 rides with no export; `navigator.wakeLock` during a ride, off
+  by default; a canvas favicon progress arc.
+
+### 7.3b Standing layout constraints
+
+- The narrow-window layout (<1000px) stacks the console and squeezes the map.
+  Desktop-first is per the design doc; it just shouldn't break, and it doesn't.
+- **The ticket column is height-constrained.** `--console` is a fixed height and
+  the stage takes the rest, so the ticket never gets more room on a taller
+  window — added content clips instead of growing. The Board button is pinned
+  outside a scrollable `.tk-body` for exactly this reason: the charter ticket
+  carries an extra duration field and used to push the button off the bottom.
+  **Check the charter ticket, not just a scheduled service, after touching that
+  column** — it is the tallest case.
+
+### 7.4 Next session's goals (from the user, end of 2026-09-07)
+
+Roughly in the order given, not necessarily in priority order:
+
+1. **Make it look nicer** — the map and especially the train. The train is
+   currently a rounded rect with two window dots, which reads fine at national
+   scale but is the most-looked-at object on screen during a ride now that the
+   camera zooms to ~10x. Keep to §8's taste constraints: no purple gradients,
+   no generic glassmorphism.
+2. **More routes.** Note the standing rule in §3: the city allow-list is the
+   user's, and **cities outside it need asking first**. New routes between
+   existing cities need no permission.
+3. **Productivity checking** — detecting whether the user wanders off to
+   YouTube and so on. **Read §7.5 before touching this**; it conflicts with a
+   load-bearing rule and is not straightforwardly possible.
+4. **More gamification** — a store: buy different trains, unlock routes, spend
+   points. Possibly reframe points as dollars. This is the first feature that
+   would make points a *currency* rather than a score, so it needs a spend
+   ledger; `rides[]` stays the source of truth for what was *earned*, and a
+   separate record tracks what was spent. Do not start mutating a stored
+   points counter — that breaks the rule in §4.
+5. **Better ambient realism.** Synthesis-only is a standing constraint (zero
+   assets, no `sounds/` folder). The honest ceiling is noise-based texture;
+   see §7.2 on measurement before retuning anything.
+
+### 7.5 The productivity-checking idea — read before building
+
+The user raised this themselves as "not sure if this is a good idea but worth
+exploring", so it is genuinely open — but two things have to be said plainly.
+
+**It contradicts a load-bearing rule.** §4: *never penalise leaving the tab*,
+and the design doc rules out cheat detection explicitly. The whole model is that
+focus is measured solely by whether the ride was allowed to finish, and that the
+user is *supposed* to be working in another app. A naive Page Visibility
+implementation would invert the app's premise.
+
+**A plain web page cannot do it anyway.** Nothing in `index.html` can see what
+other tabs or apps are doing. Real implementations need a browser extension with
+host permissions, or an OS-level agent — either of which is a different product
+with a real privacy surface, and neither of which fits the zero-asset,
+no-backend, single-page constraint in §5.
+
+If it goes ahead, the version worth building is **self-reported and
+non-punitive** — the user classifies their own ride afterwards, or the app
+surfaces patterns it already has (time of day, completion rate by duration, per
+§7.3) and lets them draw the conclusion. That keeps the no-shaming principle and
+needs no new permissions. Confirm the direction with the user before writing
+code; do not quietly ship surveillance because a bullet point asked for it.
+
+### 7.6 Further out: plane mode
+
+A second network — **plane routes, international**, switched to via a tab
+alongside the train map. A four-round pomodoro becomes something like
+JFK → LAX → SIN → DEL → DXB.
+
+Logged as explicitly further out than §7.4. What it would touch:
+
+- **The projection.** `project()` (§1) is equirectangular with a bow tuned for
+  the continental US about lon -96, and `US_OUTLINE` is a coarse US polygon.
+  A world map needs a different projection and a different outline; the bow
+  would have to become mode-dependent rather than global.
+- **Route geometry.** Flights are great-circle arcs, not Catmull-Rom curves
+  through via points — a genuinely different `routeGeometry()`, and one that has
+  to handle crossing the antimeridian.
+- **The city allow-list** grows a lot and internationally, so it needs the user.
+- **Distance** already works — `haversine()` (§4) is geodesic and needs no
+  change; leg lengths just get much larger.
+- **The camera** should carry over unchanged in principle: constant apparent
+  speed is projection-independent, but `NATIONAL_W` and the `--k` normalisation
+  are named and tuned for one map and would need to become per-mode.
+- Storage would need `journey` and `rides[]` keyed per network, or route ids
+  namespaced, so train and plane progress do not collide.
 
 ## 8. Working preferences (from the user, this session)
 

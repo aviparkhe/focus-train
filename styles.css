@@ -1,0 +1,525 @@
+/* ─────────────────────────────────────────────────────────────
+   Focus Train — a continental rail network you ride by focusing
+   ───────────────────────────────────────────────────────────── */
+/* ── themes ────────────────────────────────────────────────── */
+:root,
+:root[data-theme="night"]{
+  color-scheme:dark;
+  --ink:#0b0f14;   --ink-a:#18222d;  --ink-b:#16222d;
+  --panel:#0d131a; --panel-t:13,19,26;
+  --land:#151d26;  --coast:#2c3a46;
+  --paper:#e8e3d7; --dim:#828b95;    --dim-2:#5b646e;
+  --hair:rgba(232,227,215,.09); --hair-2:rgba(232,227,215,.16);
+  --accent:#e6a340; --accent-2:#f7d094; --on-accent:#1a1206;
+  --rest:#7fae8f;  --warn:#c47b6a;
+  --halo:#0b0f14;  --grain:.032; --scrim:rgba(6,9,12,.62);
+}
+:root[data-theme="daybreak"]{
+  color-scheme:light;
+  --ink:#f4f0e7;   --ink-a:#fffdf7;  --ink-b:#ece5d7;
+  --panel:#faf7f0; --panel-t:250,247,240;
+  --land:#e6ddc9;  --coast:#a5977a;
+  --paper:#241f18; --dim:#655e52;    --dim-2:#847a67;
+  --hair:rgba(36,31,24,.11); --hair-2:rgba(36,31,24,.20);
+  --accent:#b3452e; --accent-2:#8a3020; --on-accent:#fdf6ee;
+  --rest:#3f6f53;  --warn:#a24a38;
+  --halo:#f4f0e7;  --grain:.05; --scrim:rgba(60,52,40,.40);
+}
+:root[data-theme="blueprint"]{
+  color-scheme:dark;
+  --ink:#0a1420;   --ink-a:#13273e;  --ink-b:#0e2033;
+  --panel:#0c1826; --panel-t:12,24,38;
+  --land:#12243a;  --coast:#27465f;
+  --paper:#dbe8f2; --dim:#7e93a6;    --dim-2:#54697d;
+  --hair:rgba(219,232,242,.10); --hair-2:rgba(219,232,242,.18);
+  --accent:#54c6d8; --accent-2:#a6e8f2; --on-accent:#04212a;
+  --rest:#86b0c8;  --warn:#c98080;
+  --halo:#0a1420;  --grain:.03; --scrim:rgba(4,10,18,.64);
+}
+:root[data-theme="ember"]{
+  color-scheme:dark;
+  --ink:#100d0c;   --ink-a:#251d18;  --ink-b:#1e1613;
+  --panel:#141110; --panel-t:20,17,16;
+  --land:#1d1815;  --coast:#3c2f29;
+  --paper:#ece4dc; --dim:#948780;    --dim-2:#655b55;
+  --hair:rgba(236,228,220,.09); --hair-2:rgba(236,228,220,.17);
+  --accent:#d26a45; --accent-2:#f2a67e; --on-accent:#1c0d06;
+  --rest:#a89078;  --warn:#c2705e;
+  --halo:#100d0c;  --grain:.04; --scrim:rgba(10,7,6,.64);
+}
+:root[data-theme="terminal"]{
+  color-scheme:dark;
+  --ink:#050806;   --ink-a:#0d1c11;  --ink-b:#08130d;
+  --panel:#070c08; --panel-t:7,12,8;
+  --land:#0d160f;  --coast:#1f3b25;
+  --paper:#c9f0d0; --dim:#5f8f68;    --dim-2:#3c5e43;
+  --hair:rgba(201,240,208,.10); --hair-2:rgba(201,240,208,.18);
+  --accent:#46d47c; --accent-2:#a3f2be; --on-accent:#03150a;
+  --rest:#6fd6a4;  --warn:#c9885f;
+  --halo:#050806;  --grain:.05; --scrim:rgba(2,6,3,.68);
+}
+:root[data-theme="timetable"]{
+  color-scheme:light;
+  --ink:#f1ebdd;   --ink-a:#fdf9ef;  --ink-b:#e8e0cd;
+  --panel:#f8f3e8; --panel-t:248,243,232;
+  --land:#e0d6bd;  --coast:#9c8f70;
+  --paper:#20261f; --dim:#5c6357;    --dim-2:#7d8474;
+  --hair:rgba(32,38,31,.11); --hair-2:rgba(32,38,31,.20);
+  --accent:#2f6a4a; --accent-2:#1d4a32; --on-accent:#f3faf5;
+  --rest:#4a7d5e;  --warn:#a3543a;
+  --halo:#f1ebdd;  --grain:.052; --scrim:rgba(56,52,38,.40);
+}
+:root[data-theme="porcelain"]{
+  color-scheme:light;
+  --ink:#f6f6f4;   --ink-a:#ffffff;  --ink-b:#ecece9;
+  --panel:#fbfbfa; --panel-t:251,251,250;
+  --land:#e3e3df;  --coast:#9a9a93;
+  --paper:#22252a; --dim:#5a5e64;    --dim-2:#82868c;
+  --hair:rgba(34,37,42,.10); --hair-2:rgba(34,37,42,.19);
+  --accent:#3f4a55; --accent-2:#252d35; --on-accent:#f7f9fb;
+  --rest:#4c7a63;  --warn:#a35146;
+  --halo:#f6f6f4;  --grain:.042; --scrim:rgba(45,48,54,.36);
+}
+:root[data-theme="alpine"]{
+  color-scheme:light;
+  --ink:#eef1f4;   --ink-a:#ffffff;  --ink-b:#e4eaf0;
+  --panel:#f8fafb; --panel-t:248,250,251;
+  --land:#dae3ea;  --coast:#8fa1b1;
+  --paper:#1b2430; --dim:#56636f;    --dim-2:#788694;
+  --hair:rgba(27,36,48,.10); --hair-2:rgba(27,36,48,.19);
+  --accent:#2c6e9e; --accent-2:#194c73; --on-accent:#f3f9fd;
+  --rest:#3a7a62;  --warn:#a8544a;
+  --halo:#eef1f4;  --grain:.045; --scrim:rgba(40,54,70,.38);
+}
+
+:root{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --hdr:56px;
+  /* Raised from 226px: the ticket gained a Distance field and the Board
+     button was being clipped off the bottom. The stage is 1fr, so this
+     comes out of the map, which has height to spare. */
+  --console:248px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--paper);
+  background:
+    radial-gradient(1100px 620px at 50% -12%, var(--ink-a) 0%, transparent 60%),
+    radial-gradient(760px 460px at 88% 112%, var(--ink-b) 0%, transparent 58%),
+    var(--ink);
+  background-attachment:fixed;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.grain{
+  position:fixed;inset:0;z-index:9;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── shell ─────────────────────────────────────────────────── */
+.app{display:grid;grid-template-rows:var(--hdr) 1fr auto;height:100vh}
+
+/* ── header ────────────────────────────────────────────────── */
+header{
+  display:flex;align-items:center;gap:18px;
+  padding:0 22px;border-bottom:1px solid var(--hair);
+}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand svg{display:block;opacity:.85}
+.brand b{
+  font-weight:600;font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--paper);
+}
+.brand i{
+  font-style:normal;font-size:10px;letter-spacing:.18em;color:var(--dim-2);
+  text-transform:uppercase;border-left:1px solid var(--hair-2);padding-left:10px;margin-left:2px;
+}
+.chips{display:flex;gap:20px;align-items:center;font-family:var(--mono);font-size:11px}
+.chip{display:flex;align-items:baseline;gap:7px;letter-spacing:.06em}
+.chip b{font-weight:500;font-size:14px;color:var(--paper);font-variant-numeric:tabular-nums}
+.chip span{color:var(--dim-2);text-transform:uppercase;letter-spacing:.14em;font-size:9.5px}
+.chip.pts b{color:var(--accent-2)}
+.iconbar{display:flex;gap:2px;margin-left:12px;padding-left:16px;border-left:1px solid var(--hair)}
+.ib{
+  width:32px;height:32px;display:grid;place-items:center;border:0;border-radius:7px;
+  background:transparent;color:var(--dim);cursor:pointer;transition:.16s;
+}
+.ib:hover{background:var(--hair);color:var(--paper)}
+.ib svg{display:block}
+
+/* ── map ───────────────────────────────────────────────────── */
+.stage{position:relative;min-height:0;overflow:hidden}
+#map{width:100%;height:100%;display:block}
+:root{--k:1;--kt:1}
+#land{fill:var(--land);stroke:var(--coast);stroke-width:1.3;stroke-linejoin:round;
+  transition:fill .4s, stroke .4s}
+.hit{stroke:transparent;stroke-width:20;fill:none;cursor:pointer;stroke-linecap:round}
+.rail{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;
+  opacity:.52;transition:opacity .5s ease, stroke-width .5s ease}
+.rail.sel{opacity:1;stroke-width:4.2}
+.rail.mute{opacity:.26}
+/* Track you have actually finished stays lit — after a month the map is a
+   record of where you have been. After .mute so a ridden leg still reads
+   when another service is selected. */
+.rail.ridden{opacity:.82}
+.rail.ridden.mute{opacity:.5}
+.rail.sel.ridden{opacity:1}
+.rail.dash{stroke-dasharray:7 6}
+.trav{fill:none;stroke:var(--accent);stroke-width:4.6;stroke-linecap:round;stroke-linejoin:round}
+.dot{fill:var(--panel);stroke:var(--dim);stroke-width:1.6;transition:.4s ease}
+.dot.plain{fill:var(--dim-2);stroke:none;opacity:.55}
+.dot.on{stroke:var(--paper)}
+.dot.done{fill:var(--accent);stroke:var(--accent)}
+.lbl{
+  font-family:var(--sans);font-size:10.5px;font-weight:500;letter-spacing:.01em;
+  fill:var(--dim-2);transition:.4s ease;pointer-events:none;
+  paint-order:stroke fill;stroke:var(--halo);stroke-width:3.2;stroke-linejoin:round;
+}
+.lbl.on{fill:var(--paper)}
+.lbl.mute{opacity:.6}
+.lbl.plain{font-weight:400;font-size:9.5px;opacity:.55}
+.rail.off,.lbl.off,.dot.off{opacity:0!important;pointer-events:none}
+/* ── ride camera: counter-scaling ────────────────────────────
+   The viewBox zooms to ~10x during a ride, which would scale labels and
+   dots up with it. `--k` is the viewBox width as a fraction of the
+   national one, so multiplying every screen-sized quantity by it holds
+   those at a constant *screen* size. Land is deliberately NOT counter-
+   scaled — it is meant to grow and then fade away. These rules must stay
+   after the base ones they override, and each variant needs its own
+   (`.lbl.plain` outranks `.lbl`, so it needs restating). */
+.dot{r:calc(3.6px * var(--k));stroke-width:calc(1.6px * var(--k))}
+.dot.plain{r:calc(2.2px * var(--k))}
+.lbl{font-size:calc(10.5px * var(--k));stroke-width:calc(3.2px * var(--k))}
+.lbl.plain{font-size:calc(9.5px * var(--k))}
+.rail{stroke-width:calc(3.2px * var(--k))}
+.rail.sel{stroke-width:calc(4.2px * var(--k))}
+.rail.dash{stroke-dasharray:calc(7px * var(--k)) calc(6px * var(--k))}
+.trav{stroke-width:calc(4.6px * var(--k))}
+#land{stroke-width:calc(1.3px * var(--k))}
+#train .body{stroke-width:calc(3px * var(--kt))}
+/* At deep zoom the coarse national outline is one meaningless diagonal,
+   so it fades out and the map becomes a route strip. */
+#land{opacity:clamp(0, (var(--k) - 0.24) * 3.2, 1)}
+#train{transition:opacity .35s}
+#train .body{fill:var(--accent-2);stroke:var(--halo);stroke-width:3}
+#train .win{fill:var(--halo)}
+#pulse{fill:none;stroke:var(--accent);stroke-width:1.8}
+
+/* arrival toast */
+.toast{
+  position:absolute;left:50%;top:26px;transform:translate(-50%,-14px);
+  display:flex;align-items:center;gap:14px;
+  padding:11px 20px;border:1px solid var(--hair-2);border-radius:3px;
+  background:rgba(var(--panel-t),.94);backdrop-filter:blur(8px);
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  opacity:0;pointer-events:none;transition:.45s cubic-bezier(.2,.8,.3,1);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast b{color:var(--accent-2);font-weight:500}
+.toast s{text-decoration:none;color:var(--dim-2)}
+
+/* ── console ───────────────────────────────────────────────── */
+.console{
+  border-top:1px solid var(--hair);
+  display:grid;grid-template-columns:1fr 336px;height:var(--console);
+}
+.board{padding:14px 0 8px;min-width:0;min-height:0;display:flex;flex-direction:column}
+.board h2,.stub h2{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--dim-2);font-weight:400;margin:0 0 10px;padding:0 22px;
+  display:flex;align-items:center;gap:12px;
+}
+.board h2::after,.stub h2::after{content:"";flex:1;height:1px;background:var(--hair)}
+.rows{overflow-y:auto;padding:0 12px 6px;flex:1;scrollbar-width:thin}
+.rows::-webkit-scrollbar{width:8px}
+.rows::-webkit-scrollbar-thumb{background:var(--hair-2);border-radius:9px}
+.row{
+  display:grid;grid-template-columns:12px 84px minmax(130px,1fr) minmax(160px,1.1fr) 62px 54px;
+  align-items:center;gap:12px;
+  padding:9px 10px;border:0;width:100%;text-align:left;background:transparent;
+  font-family:var(--mono);font-size:11.5px;color:var(--paper);cursor:pointer;
+  border-radius:5px;transition:background .14s;position:relative;
+}
+.row+.row{box-shadow:0 -1px 0 var(--hair)}
+.row:hover{background:var(--hair)}
+.row.sel{background:var(--hair)}
+.row.sel::before{
+  content:"";position:absolute;left:0;top:6px;bottom:6px;width:2px;background:var(--accent);border-radius:2px;
+}
+.row .bar{width:4px;height:16px;border-radius:1px;background:var(--c)}
+.row .svc{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim-2);white-space:nowrap}
+.row .ln{color:var(--paper);letter-spacing:.02em}
+.row.sel .ln{color:var(--accent-2)}
+.row .to{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .to em{font-style:normal;color:var(--dim-2)}
+.row .dur,.row .pt{text-align:right;font-variant-numeric:tabular-nums;color:var(--dim)}
+.row .pt{color:var(--dim-2);font-size:10px}
+
+/* ticket stub */
+.stub{
+  border-left:1px dashed var(--hair-2);padding:14px 22px 18px;min-height:0;
+  display:flex;flex-direction:column;gap:0;position:relative;
+}
+.stub::before,.stub::after{
+  content:"";position:absolute;left:-7px;width:13px;height:13px;border-radius:50%;
+  background:var(--ink);border:1px solid var(--hair);
+}
+.stub::before{top:-7px}
+.stub::after{bottom:-7px}
+.stub h2{padding:0}
+.tk-line{font-size:19px;font-weight:500;letter-spacing:-.01em;margin:2px 0 14px}
+.tk-od{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.tk-od .c{flex:1;min-width:0}
+.tk-od .k{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--dim-2);text-transform:uppercase}
+.tk-od .v{font-size:13.5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk-od .arw{color:var(--dim-2);flex:0 0 auto}
+.tk-meta{
+  display:flex;flex-wrap:wrap;gap:8px 13px;font-family:var(--mono);font-size:10px;letter-spacing:.07em;
+  color:var(--dim-2);text-transform:uppercase;padding-top:12px;border-top:1px solid var(--hair);
+}
+/* Four items have to share 291px. nowrap stops a label breaking mid-word, and
+   flex-wrap is the safety net if a very long distance ever pushes past the
+   row — it wraps by item, which still reads. */
+.tk-meta > div{white-space:nowrap}
+.tk-meta b{display:block;color:var(--paper);font-size:15px;font-weight:400;margin-top:4px;
+  letter-spacing:0;font-variant-numeric:tabular-nums}
+.tk-min{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.tk-min input{
+  width:74px;background:var(--hair);border:1px solid var(--hair-2);color:var(--paper);
+  font-family:var(--mono);font-size:15px;padding:7px 9px;border-radius:4px;text-align:right;
+}
+.tk-min input:focus{outline:none;border-color:var(--accent)}
+.tk-min label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--dim-2);text-transform:uppercase}
+.grow{flex:1}
+/* The Board button is pinned to the bottom of the ticket and only the body
+   above it scrolls. Without this the charter ticket — which carries an extra
+   duration field — pushed the button clean off the console. */
+.tk-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin}
+.tk-body::-webkit-scrollbar{width:8px}
+.tk-body::-webkit-scrollbar-thumb{background:var(--hair-2);border-radius:9px}
+.stub .btn{flex:0 0 auto;margin-top:16px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+  padding:13px 16px;border:1px solid var(--accent);border-radius:4px;
+  background:var(--accent);color:var(--on-accent);cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;
+  transition:.16s;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent;color:var(--dim);border-color:var(--hair-2)}
+.btn.ghost:hover{background:var(--hair);color:var(--paper);border-color:var(--hair-2);filter:none}
+.btn.danger{background:transparent;border-color:var(--warn);color:var(--warn)}
+.btn.danger:hover{background:var(--hair);filter:none}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* Keyboard focus was invisible everywhere: the departure rows are real
+   <button>s and tab to them fine, you just could not see where you were. */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.tk-min input:focus-visible,
+.field input:focus-visible,
+.addrow input:focus-visible{outline-offset:0}
+
+/* riding console */
+.ride{display:grid;grid-template-columns:1fr auto;gap:34px;align-items:center;padding:22px 22px 24px;min-width:0}
+.ride .od{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.ride .od .k{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--dim-2);text-transform:uppercase}
+.ride .od .v{font-size:17px;margin-top:4px}
+.ride .od .v.to{color:var(--accent-2)}
+.prog{height:2px;background:var(--hair-2);border-radius:2px;overflow:hidden;margin-bottom:9px}
+.prog i{display:block;height:100%;background:var(--accent);width:0;border-radius:2px;transition:width .3s linear}
+.pmeta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim-2)}
+.clockwrap{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+.clock{
+  font-family:var(--mono);font-size:66px;font-weight:200;line-height:.92;
+  font-variant-numeric:tabular-nums;letter-spacing:-.03em;color:var(--paper);
+}
+.clock.brk{color:var(--rest)}
+.clocklab{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim-2)}
+.actions{display:flex;gap:8px}
+.actions .btn{width:auto;padding:10px 18px}
+/* shown instead of the ride controls in a tab that is not driving the clock */
+/* ambient mute, sitting with the ride controls */
+.spk{
+  display:flex;align-items:center;justify-content:center;
+  width:40px;padding:0;border:1px solid var(--hair-2);border-radius:4px;
+  background:transparent;color:var(--dim);cursor:pointer;transition:.16s;
+}
+.spk:hover{background:var(--hair);color:var(--paper)}
+.spk.off{color:var(--dim-2);border-style:dashed}
+
+.mirror{
+  display:flex;align-items:center;padding:10px 14px;
+  border:1px dashed var(--hair-2);border-radius:4px;color:var(--dim-2);
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+}
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.62}}
+.pulsing{animation:breathe 4.2s ease-in-out infinite}
+
+/* ── panels ────────────────────────────────────────────────── */
+.scrim{position:fixed;inset:0;background:var(--scrim);opacity:0;pointer-events:none;
+  transition:opacity .3s;z-index:20;backdrop-filter:blur(2px)}
+.scrim.on{opacity:1;pointer-events:auto}
+.panel{
+  position:fixed;top:0;right:0;bottom:0;width:440px;max-width:92vw;z-index:21;
+  background:var(--panel);border-left:1px solid var(--hair-2);
+  transform:translateX(102%);transition:transform .34s cubic-bezier(.2,.8,.25,1);
+  display:flex;flex-direction:column;
+}
+.panel.on{transform:none}
+.panel header{
+  border-bottom:1px solid var(--hair);padding:0 20px;height:56px;flex:0 0 auto;
+  display:flex;align-items:center;background:none;
+}
+.panel header h3{
+  margin:0;font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--dim);font-weight:400;
+}
+.panel .body{overflow-y:auto;padding:22px 20px 40px;flex:1;scrollbar-width:thin}
+.panel .body::-webkit-scrollbar{width:8px}
+.panel .body::-webkit-scrollbar-thumb{background:var(--hair-2);border-radius:9px}
+.sect{margin-bottom:30px}
+.sect>h4{
+  margin:0 0 14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--dim-2);font-weight:400;
+  display:flex;align-items:center;gap:12px;
+}
+.sect>h4::after{content:"";flex:1;height:1px;background:var(--hair)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--hair)}
+.cell{background:var(--panel);padding:15px 14px}
+.cell.wide{grid-column:1/-1}
+.cell .k{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim-2)}
+.cell .v{font-family:var(--mono);font-size:26px;font-weight:300;margin-top:7px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cell .v small{font-size:12px;color:var(--dim-2);margin-left:3px;letter-spacing:.08em}
+.cell.acc .v{color:var(--accent-2)}
+
+.heat{display:flex;gap:3px;overflow-x:auto;padding-bottom:6px}
+.hcol{display:flex;flex-direction:column;gap:3px}
+.hc{width:11px;height:11px;border-radius:2px;background:var(--hair)}
+.hc.l1{background:var(--accent);opacity:.30}
+.hc.l2{background:var(--accent);opacity:.52}
+.hc.l3{background:var(--accent);opacity:.76}
+.hc.l4{background:var(--accent)}
+.hc.fut{opacity:.3}
+.hlegend{display:flex;align-items:center;gap:6px;margin-top:12px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--dim-2);text-transform:uppercase}
+.hlegend .hc{width:9px;height:9px}
+.hmon{display:flex;gap:3px;margin-bottom:6px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.1em;color:var(--dim-2);text-transform:uppercase;height:12px}
+
+.log{display:flex;flex-direction:column}
+.li{display:grid;grid-template-columns:9px 1fr auto auto;gap:12px;align-items:center;
+  padding:10px 2px;border-bottom:1px solid var(--hair);font-family:var(--mono);font-size:11px}
+.li .mk{width:7px;height:7px;border-radius:50%;background:var(--dim-2)}
+.li.ok .mk{background:var(--accent)}
+.li .nm{color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li.no .nm{color:var(--dim)}
+.li .dt{color:var(--dim-2);font-size:10px;letter-spacing:.08em}
+.li .rs{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim-2);text-align:right;min-width:72px}
+.li.ok .rs{color:var(--accent)}
+.empty{font-family:var(--mono);font-size:11px;color:var(--dim-2);letter-spacing:.08em;
+  padding:22px 0;text-align:center;line-height:1.7}
+
+.field{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;
+  border-bottom:1px solid var(--hair)}
+.field:last-child{border-bottom:0}
+.field .lab{font-size:13px}
+.field .lab s{display:block;text-decoration:none;font-size:11px;color:var(--dim-2);margin-top:3px;line-height:1.5}
+.field input[type=number],.field input[type=text]{
+  width:82px;background:var(--hair);border:1px solid var(--hair-2);color:var(--paper);
+  font-family:var(--mono);font-size:13px;padding:7px 9px;border-radius:4px;text-align:right;flex:0 0 auto;
+}
+.field input[type=text]{text-align:left;width:auto;flex:1}
+.field input:focus{outline:none;border-color:var(--accent)}
+.field input[type=range]{
+  width:120px;padding:0;border:0;background:transparent;accent-color:var(--accent);cursor:pointer;
+}
+.tog{width:40px;height:22px;border-radius:12px;background:var(--hair-2);border:0;
+  position:relative;cursor:pointer;flex:0 0 auto;transition:.2s}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  background:var(--dim);transition:.2s}
+.tog.on{background:var(--accent);opacity:.9}
+.tog.on::after{transform:translateX(18px);background:var(--on-accent)}
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* theme picker: dark down one column, light down the other */
+.themecols{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.themecol{display:flex;flex-direction:column;gap:8px}
+.themecol h5{
+  margin:0 0 1px;font-family:var(--mono);font-size:9px;font-weight:500;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--dim-2);
+}
+.th{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;
+  border:1px solid var(--hair-2);border-radius:5px;background:transparent;color:var(--dim);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  text-align:left;transition:.16s}
+.th:hover{background:var(--hair);color:var(--paper)}
+.th.on{border-color:var(--accent);color:var(--paper)}
+/* ── ambience mixer ──────────────────────────────────────────── */
+.mix{display:flex;flex-direction:column}
+.mixrow{
+  display:grid;grid-template-columns:1fr 118px 38px;gap:12px;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--hair);
+}
+.mixrow:last-child{border-bottom:0}
+.mixlab{font-size:13px;color:var(--dim);transition:color .16s}
+.mixlab s{
+  display:block;text-decoration:none;color:var(--dim-2);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;margin-top:2px;
+}
+.mixrow.on .mixlab{color:var(--paper)}
+.mixpct{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-align:right;
+  color:var(--dim-2);transition:color .16s;
+}
+.mixrow.on .mixpct{color:var(--accent)}
+.mixsl{width:118px;padding:0;border:0;background:transparent;accent-color:var(--accent);cursor:pointer}
+.mixrow:not(.on) .mixsl{accent-color:var(--dim-2)}
+.th .sw{width:22px;height:22px;border-radius:4px;flex:0 0 auto;position:relative;
+  background:var(--sw-bg);border:1px solid var(--hair-2)}
+.th .sw::after{content:"";position:absolute;right:3px;bottom:3px;width:9px;height:9px;
+  border-radius:50%;background:var(--sw-ac)}
+.crow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--hair);font-family:var(--mono);font-size:11.5px}
+.crow .mins{color:var(--dim)}
+.xb{border:0;background:transparent;color:var(--dim-2);cursor:pointer;padding:4px 6px;border-radius:4px;
+  font-family:var(--mono);font-size:14px;line-height:1}
+.xb:hover{color:var(--warn);background:var(--hair)}
+.addrow{display:grid;grid-template-columns:1fr 80px auto;gap:8px;margin-top:12px}
+.addrow input{background:var(--hair);border:1px solid var(--hair-2);color:var(--paper);
+  font-family:var(--mono);font-size:12px;padding:9px;border-radius:4px}
+.addrow input:focus{outline:none;border-color:var(--accent)}
+.addrow button{border:1px solid var(--hair-2);background:transparent;color:var(--dim);
+  padding:0 14px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.14em}
+.addrow button:hover{color:var(--paper);background:var(--hair)}
+.btnrow{display:flex;gap:8px;margin-top:4px}
+.btnrow .btn{padding:11px 14px;font-size:10px}
+.note{font-size:11.5px;color:var(--dim-2);line-height:1.65;margin:14px 0 0}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .prog i{transition:none}
+}
+/* narrow-window fallback (desktop-first, but don't break) */
+@media (max-width:960px){
+  .console{grid-template-columns:1fr;height:auto;min-height:var(--console)}
+  .stub{border-left:0;border-top:1px dashed var(--hair-2)}
+  .stub::before{top:-7px;left:auto;right:22px}
+  .stub::after{display:none}
+  .row{grid-template-columns:12px 78px 1fr 60px;gap:10px}
+  .row .to,.row .pt{display:none}
+  .clock{font-size:48px}
+  .rows{max-height:172px}
+  .stub{padding:12px 18px 16px}
+  .tk-line{font-size:17px;margin-bottom:10px}
+  .tk-od{margin-bottom:10px}
+  .ride{grid-template-columns:1fr;gap:18px}
+  .clockwrap{align-items:flex-start;text-align:left}
+}
