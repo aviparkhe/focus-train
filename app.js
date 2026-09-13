@@ -89,6 +89,13 @@ const ROUTES = [
     stops:[ {c:"was"}, {c:"phl"}, {c:"nyc"}, {c:"bos", via:[[-72.7,41.4]]} ]
   },
   {
+    /* Same corridor as the Regional, fewer stops — a quick ride for a short
+       break rather than a distinct physical line. Runs the DC/Philly leg of
+       the Regional's own geometry, so the tracks legitimately overlap. */
+    id:"acela", name:"Acela Express", service:"Corridor", minutes:10, color:"#3f9e8f",
+    stops:[ {c:"was"}, {c:"phl"}, {c:"nyc"} ]
+  },
+  {
     id:"crescent", name:"Crescent", service:"Overnight", minutes:45, color:"#4d8a63",
     stops:[ {c:"msy"}, {c:"atl", via:[[-86.8,32.4]]}, {c:"clt", via:[[-82.5,34.6]]},
             {c:"was", via:[[-78.5,37.3]]}, {c:"nyc"} ]
